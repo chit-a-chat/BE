@@ -1,6 +1,6 @@
-package com.example.chitachat.controller;
+package com.shyji.chitachat.controller;
 
-import com.example.chitachat.dto.ApiResponse;
+import com.shyji.chitachat.dto.ApiResponse;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

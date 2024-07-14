@@ -1,4 +1,4 @@
-package com.example.chitachat;
+package com.shyji.chitachat;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;

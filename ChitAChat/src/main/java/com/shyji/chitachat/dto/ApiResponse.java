@@ -1,4 +1,4 @@
-package com.example.chitachat.dto;
+package com.shyji.chitachat.dto;
 
 import java.util.HashMap;
 import java.util.List;

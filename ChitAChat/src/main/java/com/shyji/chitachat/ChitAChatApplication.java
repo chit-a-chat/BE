@@ -1,4 +1,4 @@
-package com.example.chitachat;
+package com.shyji.chitachat;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

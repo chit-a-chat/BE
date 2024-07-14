@@ -1,6 +1,6 @@
-package com.example.chitachat.exception;
+package com.shyji.chitachat.exception;
 
-import com.example.chitachat.dto.ApiResponse;
+import com.shyji.chitachat.dto.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
