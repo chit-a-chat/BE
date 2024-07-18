@@ -1,0 +1,71 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Cwd 'abs_path';
+
+# Command to get list of staged Java files
+my $git_command = "git diff --cached --name-only --diff-filter=ACM | grep '\.java\$' | uniq";
+open(my $files, "$git_command |") or die "Cannot run '$git_command': $!\n";
+
+# Configuration keys
+my $CONFIG_CHECK_FILE = "checkstyle.checkfile";
+my $CONFIG_JAR = "checkstyle.jar";
+my $CONFIG_JAVA = "java.command";
+
+# Fetch configuration values from Git config
+my $check_file = `git config --get $CONFIG_CHECK_FILE`;
+my $checkstyle_jar = `git config --get $CONFIG_JAR`;
+my $java_command = `git config --get $CONFIG_JAVA`;
+
+# Validate configuration
+if (!$check_file || !$checkstyle_jar) {
+    die "You must configure checkstyle in your git config:\n"
+    . "\t$CONFIG_CHECK_FILE - path to your checkstyle.xml file\n"
+    . "\t$CONFIG_JAR - path to your checkstyle jar file\n"
+    . "\t$CONFIG_JAVA - path to your java executable (optional)\n";
+}
+
+# Default java command if not provided
+$java_command = "java" if (!$java_command);
+
+# Trim newline characters
+chomp($check_file);
+chomp($checkstyle_jar);
+chomp($java_command);
+
+# Resolve relative paths to absolute paths
+$check_file = abs_path($check_file);
+$checkstyle_jar = abs_path($checkstyle_jar);
+
+# Command to run Checkstyle on each staged Java file
+my $command = "$java_command -jar \"$checkstyle_jar\" -c \"$check_file\"";
+
+my @java_files;
+
+# Collect staged Java files
+while (my $file = <$files>) {
+    chomp($file);
+    push @java_files, $file;
+    $command .= " \"$file\"";
+}
+
+close($files);
+
+# If there are staged Java files, run Checkstyle
+if (@java_files) {
+    if (run_and_log_system($command)) {
+        print STDERR "Commit aborted due to Checkstyle violations.\n";
+        exit 1; # Abort commit
+    }
+}
+
+exit 0; # Allow commit if no violations
+
+sub run_and_log_system {
+    my ($cmd) = @_;
+    my $output = qx($cmd);
+    my $exit_code = $? >> 8;
+    print $output;
+    return $exit_code;
+}

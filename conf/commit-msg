@@ -1,0 +1,50 @@
+#!/bin/sh
+
+# 커밋 메시지 파일 경로
+commit_msg_file=$1
+
+# 커밋 메시지 읽기
+commit_msg=$(cat "$commit_msg_file")
+
+# 커밋 메시지 패턴
+header_regex='^\[feat|bugfix|refactor|style|doc|test|build|chore|delete|infra\] [^\s]+$'
+body_regex='^- .{1,72}$'
+footer_regex='^closes #([0-9]+)$'
+
+# 메시지 분리
+IFS=$'\n' read -d '' -r -a lines < "$commit_msg_file"
+
+# 메시지 검증
+error_msg=""
+
+# 제목 검증
+if ! echo "${lines[0]}" | grep -Eq "$header_regex"; then
+  error_msg="${error_msg}\nError: 제목 형식이 올바르지 않습니다."
+fi
+
+# 제목과 본문 사이의 빈 줄 검증
+if [ "${#lines[@]}" -lt 2 ] || [ -z "${lines[1]}" ]; then
+  error_msg="${error_msg}\nError: 제목과 본문 사이에 빈 줄을 추가하세요."
+fi
+
+# 본문 검증
+for ((i = 1; i < ${#lines[@]} - 1; i++)); do
+  line="${lines[$i]}"
+  if [ "${line:0:1}" != "#" ]; then
+    if ! echo "$line" | grep -Eq "$body_regex"; then
+      error_msg="${error_msg}\nError: 본문 형식이 올바르지 않습니다. 한 줄에 최대 72 글자까지 입력하세요."
+      break
+    fi
+  fi
+done
+
+# 꼬리말 검증
+if ! echo "${lines[-1]}" | grep -Eq "$footer_regex"; then
+  error_msg="${error_msg}\nError: 꼬리말 형식이 올바르지 않습니다."
+fi
+
+# 커밋 메시지 형식 오류가 있는 경우
+if [ -n "$error_msg" ]; then
+  echo -e "$error_msg"
+  exit 1
+fi
