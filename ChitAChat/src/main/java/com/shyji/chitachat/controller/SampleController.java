@@ -1,6 +1,6 @@
 package com.shyji.chitachat.controller;
 
-import com.shyji.chitachat.dto.ApiResponse;
+import com.shyji.chitachat.dto.ApiResponseDto;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class SampleController {
 
   @GetMapping("/responseTest")
-  public ApiResponse<String> getTest() {
+  public ApiResponseDto<String> getTest() {
     String example = "Hello Test";
-    return ApiResponse.success(example);
+    return ApiResponseDto.success(example);
   }
 }
